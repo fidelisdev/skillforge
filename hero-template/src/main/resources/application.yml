@@ -9,7 +9,9 @@ guild:
   github:
     owner: skillforge-guild   # change to your GitHub org/user
     repo: skillforge           # change to your repo name
-    token: ${GITHUB_TOKEN:}    # optional — 60 req/hour without, 5000 with
+    token: ${GITHUB_TOKEN:}    # required for guild hub (write operations)
+  hub:
+    enabled: false             # set true on the central guild hub node only
 
 logging:
   level:

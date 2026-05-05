@@ -156,6 +156,63 @@ public class GitHubClient {
         }
     }
 
+    public List<JsonNode> fetchPendingRegistrations() {
+        try {
+            String url = "%s/repos/%s/%s/issues?labels=hero&state=open&per_page=100".formatted(API, owner, repo);
+            JsonNode issues = get(url);
+            List<JsonNode> pending = new ArrayList<>();
+            for (JsonNode issue : issues) {
+                boolean alreadyProcessed = false;
+                for (JsonNode label : issue.path("labels")) {
+                    String name = label.path("name").asText();
+                    if ("registered".equals(name) || "invalid".equals(name)) {
+                        alreadyProcessed = true;
+                        break;
+                    }
+                }
+                if (!alreadyProcessed) pending.add(issue);
+            }
+            return pending;
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    public void postComment(int issueNumber, String body) throws Exception {
+        requireToken("postComment");
+        String url = "%s/repos/%s/%s/issues/%d/comments".formatted(API, owner, repo, issueNumber);
+        String payload = mapper.writeValueAsString(java.util.Map.of("body", body));
+        post(url, payload);
+    }
+
+    public void addLabel(int issueNumber, String label) throws Exception {
+        requireToken("addLabel");
+        String url = "%s/repos/%s/%s/issues/%d/labels".formatted(API, owner, repo, issueNumber);
+        String payload = mapper.writeValueAsString(java.util.Map.of("labels", List.of(label)));
+        post(url, payload);
+    }
+
+    public boolean hasToken() {
+        return !token.isBlank();
+    }
+
+    private void requireToken(String operation) {
+        if (token.isBlank()) throw new IllegalStateException(
+                "GITHUB_TOKEN required for " + operation + ". Set guild.github.token or export GITHUB_TOKEN.");
+    }
+
+    private void post(String url, String body) throws Exception {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Accept", "application/vnd.github+json")
+                .header("X-GitHub-Api-Version", "2022-11-28")
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+        http.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
     private JsonNode get(String url) throws Exception {
         var builder = HttpRequest.newBuilder()
                 .uri(URI.create(url))
