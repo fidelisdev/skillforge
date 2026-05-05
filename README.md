@@ -171,6 +171,8 @@ record QuestUnlockedEvent(String questId, String title, QuestRarity rarity,
 
 Leia [GUILD_ONBOARDING.md](GUILD_ONBOARDING.md) — tem os passos concretos para subir seu nó herói e se registrar na guilda.
 
+Se quiser o fluxo completo com exemplo de issue de registro (prefixo `[HERO-REGISTRATION]`), veja [HERO_REGISTRATION.md](HERO_REGISTRATION.md).
+
 Declare suas skills em [SKILL_MANIFEST_GUIDE.md](SKILL_MANIFEST_GUIDE.md) antes de registrar.
 
 Escolha sua primeira quest em [QUEST_BOARD.md](QUEST_BOARD.md).

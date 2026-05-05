@@ -51,6 +51,8 @@ curl http://localhost:8081/api/health
 curl http://localhost:8081/api/manifest
 ```
 
+Para um passo a passo mais detalhado do registro (incluindo exemplo de issue com prefixo `[HERO-REGISTRATION]`), veja [`HERO_REGISTRATION.md`](HERO_REGISTRATION.md).
+
 O dashboard já carrega as quests e membros da guilda direto do GitHub.
 
 Quando o registro for confirmado, o Guild Hub emite automaticamente para todos os membros ativos:
