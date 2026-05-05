@@ -2,127 +2,102 @@
 
 > Transformando as habilidades de uma equipa de developers em uma guilda capaz de descobrir, desbloquear e resolver problemas de negócio em tempo real.
 
-O **SkillForge** é uma iniciativa para estruturar capacidade técnica coletiva como um sistema vivo, observável e utilizável além da coordenação manual entre pessoas.
+---
 
-A proposta parte de um problema recorrente em equipas de software:  
-a equipa até possui competências valiosas distribuídas entre diferentes developers, mas raramente existe uma forma clara, dinâmica e operacional de saber **o que o grupo consegue resolver em dado momento**, quais problemas estão bloqueados por falta de skill e que novas possibilidades surgem quando uma nova especialização entra no sistema.
+## Navegação
+
+| | Documento | Para quem |
+|---|---|---|
+| 🚪 | [GUILD_ONBOARDING.md](GUILD_ONBOARDING.md) | Novo na guilda? Comece aqui. |
+| ⚔️ | [QUEST_BOARD.md](QUEST_BOARD.md) | Tasks por nível com critérios de aceitação. |
+| 🧬 | [SKILL_MANIFEST_GUIDE.md](SKILL_MANIFEST_GUIDE.md) | Como declarar e validar suas skills. |
 
 ---
 
-## Problema
+## O que é
 
-Em muitas equipas, capacidade técnica fica distribuída entre:
+O **SkillForge** é uma plataforma de capacidade coletiva orientada a skills.
 
-- o conhecimento individual de cada developer
-- especializações implícitas que não estão formalizadas
-- dependência de pessoas específicas para certos tipos de problema
-- resolução sequencial de questões que poderiam ser tratadas em paralelo
-- pouca visibilidade sobre a composição real de skills da equipa
-- dificuldade em reutilizar expertise de forma operacional
+Cada developer roda um **nó herói** localmente. Esse nó se registra num **Guild Hub** central, que mantém um grafo determinístico das capacidades da equipa, roteia problemas para os heróis certos em paralelo e emite notificações em tempo real quando novas skills desbloqueiam novas possibilidades.
 
-Quando essa capacidade não é explicitada nem orquestrada, o time passa a depender excessivamente de coordenação manual.  
-Com o tempo, isso gera:
-
-- baixa visibilidade sobre o potencial coletivo da equipa
-- onboarding mais lento
-- gargalos em especialistas
-- menor paralelismo na resolução de problemas
-- dificuldade em identificar lacunas de skill
-- dependência de APIs cloud para inferência e orquestração inteligente
-
-Em outras palavras: a equipa possui capacidade, mas não consegue transformá-la facilmente em um sistema coordenado de execução.
+O objetivo não é apenas gamificar colaboração — é transformar especialização técnica em infraestrutura operacional.
 
 ---
 
-## Proposta
+## O problema
 
-O SkillForge propõe uma arquitetura em que cada developer possa expor a sua especialidade através de um **nó herói especializado**, enquanto um hub central mantém uma visão determinística das capacidades disponíveis na guilda.
+Em muitas equipas, capacidade técnica fica invisível:
 
-Esse sistema permite:
+- conhecimento individual não formalizado
+- especializações implícitas que dependem de coordenação manual
+- ninguém sabe exatamente o que o grupo consegue resolver agora
+- onboarding lento, gargalos em especialistas, baixo paralelismo
 
-- registar skills declaradas por cada developer
-- manter um grafo de capacidades da equipa
-- identificar quais quests podem ser resolvidas com as skills atuais
-- desbloquear novos problemas quando uma nova habilidade entra no sistema
-- distribuir problemas em paralelo pelos nós relevantes
-- sintetizar contribuições numa solução final
-- acompanhar progressão, XP e contribuição por herói
-
-O objetivo não é apenas gamificar colaboração, mas transformar especialização técnica em infraestrutura operacional.
-
----
-
-## Conceito central
-
-### Guild Capability Platform
-
-O **SkillForge** funciona como uma plataforma de capacidade coletiva orientada a skills.
-
-Cada developer atua como um herói com autonomia local, capaz de:
-
-- declarar as suas skills ao entrar na guilda
-- expor um endpoint próprio para resolução de problemas
-- contribuir com respostas especializadas
-- participar de quests compatíveis com a sua especialidade
-- evoluir em reputação, XP e impacto dentro do sistema
-
-No centro dessa dinâmica, o **Guild Hub** atua como mestre da guilda, ajudando a:
-
-- manter um catálogo vivo de capacidades
-- recalcular quests desbloqueadas
-- fazer roteamento determinístico sem depender de LLM
-- executar fan-out paralelo para os heróis relevantes
-- emitir notificações em tempo real quando novas possibilidades surgem
-- coordenar síntese e persistência de resultados
-
----
-
-## Como funciona
-
-De forma conceitual, o fluxo é o seguinte:
-
-1. um developer executa o seu nó herói localmente
-2. o herói regista-se no Guild Hub com as suas skills e manifesto
-3. o hub atualiza o Capability Graph da guilda
-4. quests pendentes são reavaliadas com base nas capacidades atuais
-5. quando um problema é submetido, o hub seleciona os heróis relevantes
-6. a execução acontece em paralelo entre os nós especializados
-7. um sintetizador combina as contribuições numa resposta final
-8. eventos, XP, progresso e trilha de auditoria são persistidos
+O time possui capacidade. Mas não consegue usá-la como sistema.
 
 ---
 
 ## O momento mágico
 
-O momento central do SkillForge acontece quando uma nova especialização entra na guilda e altera imediatamente aquilo que a equipa consegue resolver.
-
-Via SSE, o sistema pode notificar em tempo real algo como:
-
-> “MLOracle entrou na guilda. Nova habilidade: ml-inference.  
+> "MLOracle entrou na guilda. Nova habilidade: `ml-inference`.  
 > 3 quests desbloqueadas: Previsão de Churn [RARE +350 XP],  
-> Análise de Sentimento [EPIC +700 XP],  
-> Pipeline ML [LEGENDARY +1500 XP].”
+> Análise de Sentimento [EPIC +700 XP], Pipeline ML [LEGENDARY +1500 XP]."
 
-Esse é o ponto em que capacidade deixa de ser apenas atributo humano e passa a ser comportamento emergente do sistema.
-
----
-
-## O que o projeto busca resolver
-
-O SkillForge busca reduzir problemas como:
-
-- conhecimento técnico silado
-- baixa reutilização de expertise entre developers
-- desconhecimento sobre a capacidade total da equipa
-- dificuldade em saber quais problemas estão desbloqueados
-- execução manual e sequencial de problemas que poderiam ser tratados por especialistas em paralelo
-- dependência estrutural de serviços cloud para compor inteligência operacional
+Esse é o ponto em que capacidade deixa de ser atributo humano e passa a ser comportamento emergente do sistema.
 
 ---
 
-## Arquitectura
+## Como funciona
 
-```text
+```
+Dev sobe nó herói  →  herói registra skills no Guild Hub
+                   →  hub atualiza o Capability Graph
+                   →  quests pendentes são reavaliadas
+                   →  SSE notifica toda a guilda em tempo real
+
+Problema submetido →  hub seleciona heróis relevantes
+                   →  fan-out paralelo (CompletableFuture.allOf)
+                   →  sintetizador combina respostas
+                   →  XP distribuído, audit trail persistido
+```
+
+---
+
+## Mecânicas de jogo
+
+### Raridade das quests
+
+| Raridade | Skills necessárias | XP | Quem pode ver |
+|---|---|---|---|
+| COMMON | 1–2 | 50–200 | Apprentice+ |
+| RARE | 3–4 | 200–500 | Journeyman+ |
+| EPIC | 5–6 | 500–1000 | Expert+ |
+| LEGENDARY | 6+ | 1000+ | Master+ |
+
+Ver todas as quests disponíveis → [QUEST_BOARD.md](QUEST_BOARD.md)
+
+### Progressão do herói
+
+| Nível | Nome | XP | O que desbloqueia |
+|---|---|---|---|
+| 1 | Apprentice | 0 | Quests COMMON |
+| 3 | Journeyman | 1.000 | Quests RARE + arquitetura |
+| 5 | Expert | 3.000 | Quests EPIC + métricas da guilda |
+| 8 | Master | 8.000 | Quests LEGENDARY + mentoria |
+| 10 | Archmage | 20.000 | Define skills, aprova quests |
+
+### Distribuição de XP
+
+- skills `required` → XP base ÷ nº heróis × 1.2
+- skills `optional` → XP base ÷ nº heróis × 0.6
+- bônus de velocidade → top 25% mais rápidos recebe +10%
+- sintetizador → 15% fixo por quest
+
+---
+
+## Arquitetura
+
+```
 Frontend (SSE) → Guild Hub :8080 → CompletableFuture.allOf()
                                   → Herói :8081 (phi3:mini)
                                   → Herói :8082 (phi3:mini)
@@ -130,50 +105,21 @@ Frontend (SSE) → Guild Hub :8080 → CompletableFuture.allOf()
                                   → Sintetizador :8090 (qwen2.5:7b)
 ```
 
-### Stack técnica
+### Stack
 
 - **Java 21** — Records, Virtual Threads, HttpClient nativo
-- **Spring Boot 3.3** — apenas `spring-boot-starter-web`
-- **Ollama** — modelos locais por defeito
-  - `phi3:mini` por nó herói
-  - `qwen2.5:7b` no sintetizador
-- **SQLite** — persistência de heróis, quests, XP e audit trail
-- **Maven multi-módulo**
-  - `core`
-  - `guild-hub`
-  - `synthesizer`
-  - `hero-template`
-  - `api`
+- **Spring Boot 3.3** — `spring-boot-starter-web` + Thymeleaf
+- **Ollama** — `phi3:mini` por nó herói · `qwen2.5:7b` no sintetizador
+- **SQLite** — persistência local de heróis, quests, XP e audit trail
+- **GitHub** — fonte de verdade para quests e membros da guilda
+- **Maven multi-módulo** — `hero-template` · `guild-hub` · `synthesizer` · `core` · `api`
 
----
-
-## Princípios de design
-
-- **Sem LLM no roteamento**  
-  O Capability Graph é determinístico e implementado em Java puro.
-
-- **Contratos imutáveis desde o início**  
-  A comunicação principal é modelada com Java Records.
-
-- **Resultado parcial continua a avançar**  
-  Timeouts e respostas degradadas fazem parte do desenho do sistema.
-
-- **Local-first por defeito**  
-  Os modelos correm localmente via Ollama e os dados não precisam sair da máquina.
-
-- **Cada developer é owner do seu herói**  
-  Cada nó é independente, tem a sua própria porta e autonomia operacional.
-
-- **Crescimento orgânico da guilda**  
-  O sistema só resolve aquilo que as skills disponíveis permitem resolver.
-
----
-
-## Contratos base
+### Contratos base
 
 ```java
-record HeroRegistration(String heroId, String heroName, String heroClass,
-    List<String> skills, String endpoint, String model, String specialty)
+record HeroManifest(String heroId, String heroName, String heroClass,
+    List<String> skills, String endpoint, String model, String specialty,
+    int level, int xp)
 
 record AgentOutput(String result, double confidence, String reason, String agentId)
 
@@ -183,110 +129,68 @@ record QuestUnlockedEvent(String questId, String title, QuestRarity rarity,
 
 ---
 
-## Mecânicas de jogo
+## Princípios de design
 
-### Quest Board
-
-| Raridade   | Skills necessárias | XP reward | Estado         |
-|------------|-------------------|-----------|----------------|
-| COMMON     | 1–2               | 50–200    | Disponível     |
-| RARE       | 3–4               | 200–500   | Desbloqueável  |
-| EPIC       | 5–6               | 500–1000  | Requer equipa  |
-| LEGENDARY  | 6+                | 1000+     | Toda a guilda  |
-
-### Progressão do Herói
-
-| Nível | Nome       | XP        | Privilégios                    |
-|-------|------------|-----------|--------------------------------|
-| 1     | Apprentice | 0         | Quests COMMON                  |
-| 3     | Journeyman | 1 000     | Quests RARE                    |
-| 5     | Expert     | 3 000     | Quests EPIC, voto em conflitos |
-| 8     | Master     | 8 000     | Quests LEGENDARY, mentor       |
-| 10    | Archmage   | 20 000    | Define skills, aprova quests   |
-
-### Distribuição de XP
-
-- skills `required` → XP base / nº de heróis × 1.2
-- skills `optional` → XP base / nº de heróis × 0.6
-- bónus de velocidade → top 25% mais rápidos recebe +10% XP
-- sintetizador → 15% fixo por quest
+- **Sem LLM no roteamento** — o Capability Graph é determinístico, Java puro
+- **Contratos imutáveis** — comunicação modelada com Java Records
+- **Resultado parcial avança** — timeouts e respostas degradadas fazem parte do design
+- **Local-first** — modelos via Ollama, dados não saem da máquina
+- **Cada dev é owner do seu herói** — nó independente, porta própria, autonomia total
+- **Crescimento orgânico** — o sistema só resolve o que as skills disponíveis permitem
 
 ---
 
-## Roadmap inicial
+## Roadmap
 
-### 1. Agente mínimo
-- [ ] criar o nó herói mínimo com 4 ficheiros Java
-- [ ] integrar Ollama localmente
-- [ ] expor `/solve`, `/manifest` e `/health`
+### Fase 1 — Herói mínimo
+- [x] template do nó herói com Spring Boot 3.3 / Java 21
+- [x] dashboard web com dados da guilda via GitHub API
+- [x] `/api/health`, `/api/manifest`, `/events` (SSE)
+- [ ] integração Ollama em `/api/solve`
 
-### 2. Guild Hub core
-- [ ] implementar registo de heróis
-- [ ] construir o Capability Graph
-- [ ] fazer fan-out paralelo com `CompletableFuture`
-- [ ] emitir notificações SSE para quests desbloqueadas
+### Fase 2 — Guild Hub core
+- [ ] endpoint de registro de heróis
+- [ ] Capability Graph determinístico
+- [ ] fan-out paralelo com `CompletableFuture`
+- [ ] SSE broadcast de quests desbloqueadas
 
-### 3. Gamificação completa
-- [ ] implementar XP e leaderboard
-- [ ] criar o Training Dojo
-- [ ] expor Skill Gap Dashboard
-- [ ] disponibilizar dashboard web em tempo real
+### Fase 3 — Gamificação completa
+- [ ] XP engine e leaderboard
+- [ ] Skill Gap Dashboard
+- [ ] Training Dojo
+- [ ] notificações automáticas por herói
 
-### 4. Evolução para produto
-- [ ] permitir submissão de quests via API
-- [ ] suportar recompensa por quest completada
-- [ ] evoluir para marketplace de capacidades
-- [ ] expandir para múltiplos domínios de negócio
-
----
-
-## Visão
-
-Construir uma plataforma em que as habilidades de uma equipa não ficam apenas distribuídas entre pessoas, mas passam a compor um sistema vivo, coordenado e capaz de revelar, em tempo real, o potencial coletivo da guilda.
-
-Em um cenário ideal:
-
-- a equipa sabe exactamente quais capacidades possui
-- novos heróis desbloqueiam novas possibilidades de execução
-- problemas de negócio podem ser resolvidos de forma mais paralela
-- especialização torna-se reutilizável como infraestrutura
-- a colaboração passa a emergir também do sistema, não apenas da coordenação humana
+### Fase 4 — Produto
+- [ ] submissão de quests via API
+- [ ] marketplace de capacidades
+- [ ] múltiplos domínios de negócio
 
 ---
 
-## Estrutura documental
+## Para começar
 
-| Ficheiro                  | Conteúdo                                          |
-|---------------------------|---------------------------------------------------|
-| `GUILD_ONBOARDING.md`     | Entrada gamificada para novos heróis              |
-| `QUEST_BOARD.md`          | Tasks por nível com critérios de aceitação        |
-| `SKILL_MANIFEST_GUIDE.md` | Manual para declarar e validar skills no hub      |
-| `VISION.md`               | Visão do produto e conceito base                  |
-| `PROJECT_CONTEXT.md`      | Arquitectura, contratos e decisões técnicas       |
-| `GETTING_STARTED.md`      | Código completo do agente mínimo                  |
-| `ISSUES.md`               | Backlog com milestones e issues                   |
-| `CLAUDE.md`               | Regras para o Claude Code                         |
-| `CLAUDE_CODE_GUIDE.md`    | Prompts de apoio à implementação                  |
+Leia [GUILD_ONBOARDING.md](GUILD_ONBOARDING.md) — tem os passos concretos para subir seu nó herói e se registrar na guilda.
+
+Declare suas skills em [SKILL_MANIFEST_GUIDE.md](SKILL_MANIFEST_GUIDE.md) antes de registrar.
+
+Escolha sua primeira quest em [QUEST_BOARD.md](QUEST_BOARD.md).
 
 ---
 
 ## Contribuição
 
-Contribuições são bem-vindas, especialmente em temas como:
+Contribuições são bem-vindas em:
 
 - modelação de capability graphs
 - orquestração paralela entre agentes
 - agentes locais com Ollama
-- contratos imutáveis em Java
 - gamificação aplicada à colaboração técnica
-- visibilidade operacional de skills e lacunas de capacidade
+- visibilidade operacional de skills e lacunas
 
-Se a proposta fizer sentido para você, sinta-se à vontade para abrir uma issue ou iniciar uma discussão.
+Abra uma issue ou inicie uma discussão.
 
 ---
 
 ## Status
 
-Projeto em construção.
-
-A visão está estruturada e a implementação do proof of concept está a iniciar.
+Fase 1 em construção. Hero template funcional com dashboard web e integração GitHub API.
