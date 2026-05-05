@@ -256,14 +256,17 @@ Em um cenário ideal:
 
 ## Estrutura documental
 
-| Ficheiro               | Conteúdo                                     |
-|------------------------|----------------------------------------------|
-| `VISION.md`            | Visão do produto e conceito base             |
-| `PROJECT_CONTEXT.md`   | Arquitectura, contratos e decisões técnicas  |
-| `GETTING_STARTED.md`   | Código completo do agente mínimo             |
-| `ISSUES.md`            | Backlog com milestones e issues              |
-| `CLAUDE.md`            | Regras para o Claude Code                    |
-| `CLAUDE_CODE_GUIDE.md` | Prompts de apoio à implementação             |
+| Ficheiro                  | Conteúdo                                          |
+|---------------------------|---------------------------------------------------|
+| `GUILD_ONBOARDING.md`     | Entrada gamificada para novos heróis              |
+| `QUEST_BOARD.md`          | Tasks por nível com critérios de aceitação        |
+| `SKILL_MANIFEST_GUIDE.md` | Manual para declarar e validar skills no hub      |
+| `VISION.md`               | Visão do produto e conceito base                  |
+| `PROJECT_CONTEXT.md`      | Arquitectura, contratos e decisões técnicas       |
+| `GETTING_STARTED.md`      | Código completo do agente mínimo                  |
+| `ISSUES.md`               | Backlog com milestones e issues                   |
+| `CLAUDE.md`               | Regras para o Claude Code                         |
+| `CLAUDE_CODE_GUIDE.md`    | Prompts de apoio à implementação                  |
 
 ---
 

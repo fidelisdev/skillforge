@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${hero.heroName} + ' — SkillForge Guild'">SkillForge Guild</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0d0f14;
+            --bg2: #13161e;
+            --bg3: #1a1e2a;
+            --border: #252a38;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --text3: #475569;
+            --accent: #6366f1;
+            --accent2: #818cf8;
+            --green: #10b981;
+            --yellow: #f59e0b;
+            --red: #ef4444;
+            --purple: #a855f7;
+            --mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        body { background: var(--bg); color: var(--text); font-family: var(--mono), monospace; font-size: 14px; line-height: 1.6; }
+        a { color: var(--accent2); text-decoration: none; }
+        a:hover { color: var(--text); }
+
+        .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .topbar-brand { font-size: 16px; font-weight: 600; letter-spacing: 0.05em; color: var(--accent2); }
+        .topbar-brand span { color: var(--text3); font-weight: 400; }
+        .topbar-nav { display: flex; gap: 24px; font-size: 13px; }
+        .topbar-nav a { color: var(--text2); }
+        .topbar-nav a:hover { color: var(--text); }
+        .hero-badge { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
+        .level-tag { background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: 11px; color: var(--accent2); }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+        .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+        .card-title { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        .stat-num { font-size: 32px; font-weight: 700; color: var(--text); }
+        .stat-label { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+        .onboarding { background: var(--bg2); border: 1px solid var(--accent); border-radius: 8px; padding: 28px; margin-bottom: 24px; }
+        .onboarding h1 { font-size: 20px; font-weight: 600; color: var(--accent2); margin-bottom: 8px; }
+        .onboarding p { color: var(--text2); margin-bottom: 16px; line-height: 1.7; }
+        .onboarding .steps { list-style: none; counter-reset: steps; }
+        .onboarding .steps li { counter-increment: steps; padding: 8px 0; color: var(--text2); display: flex; gap: 12px; }
+        .onboarding .steps li::before { content: counter(steps); min-width: 22px; height: 22px; background: var(--bg3); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent2); flex-shrink: 0; margin-top: 2px; }
+        code { background: var(--bg3); border: 1px solid var(--border); padding: 1px 6px; border-radius: 3px; font-size: 12px; color: var(--green); }
+
+        .skill-pill { display: inline-block; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: 11px; color: var(--text2); margin: 2px; }
+        .member-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .member-row:last-child { border-bottom: none; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); object-fit: cover; }
+        .avatar-placeholder { width: 32px; height: 32px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text3); }
+        .member-name { font-size: 13px; color: var(--text); font-weight: 500; }
+        .member-class { font-size: 11px; color: var(--text3); }
+        .member-level { margin-left: auto; font-size: 11px; color: var(--accent2); background: var(--bg3); border: 1px solid var(--border); padding: 2px 8px; border-radius: 4px; }
+
+        .locked { opacity: 0.4; }
+        .locked-card { background: var(--bg2); border: 1px dashed var(--border); border-radius: 8px; padding: 20px; text-align: center; color: var(--text3); }
+        .lock-icon { font-size: 24px; margin-bottom: 8px; }
+        .unlock-hint { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+        .event-feed { font-size: 12px; color: var(--text2); max-height: 200px; overflow-y: auto; }
+        .event-item { padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+        .event-time { color: var(--text3); flex-shrink: 0; }
+        .event-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 6px; }
+
+        .progress-bar { background: var(--bg3); border-radius: 4px; height: 6px; overflow: hidden; margin-top: 8px; }
+        .progress-fill { background: var(--accent); height: 100%; border-radius: 4px; transition: width 0.3s; }
+
+        .section-gap { margin-bottom: 24px; }
+        .section-title { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
+        .not-configured { background: var(--bg2); border: 1px solid var(--yellow); border-radius: 8px; padding: 16px 20px; color: var(--yellow); font-size: 13px; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-brand">SKILL<span>FORGE</span></div>
+    <nav class="topbar-nav">
+        <a href="/">Dashboard</a>
+        <a href="/quests">Quests</a>
+    </nav>
+    <div class="hero-badge">
+        <span th:text="${hero.heroName}">Hero</span>
+        <span class="level-tag" th:text="${heroLevel.name()}">APPRENTICE</span>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Not configured warning -->
+    <div class="not-configured" th:if="${hero.heroId == 'hero-unknown' or hero.heroId == 'your-hero-id'}">
+        Configure <code>manifest.json</code> com seu heroId, nome e skills para iniciar sua jornada.
+        Veja <a href="/quests">SKILL_MANIFEST_GUIDE.md</a> para instruções.
+    </div>
+
+    <!-- Onboarding — visible to all -->
+    <div class="onboarding section-gap" th:if="${isApprentice}">
+        <h1>Bem-vindo à Guild, <span th:text="${hero.heroName}">Herói</span>.</h1>
+        <p>
+            A <strong>SkillForge Guild</strong> é um sistema distribuído onde cada developer expõe
+            suas habilidades como um nó vivo. Quando você entra, o sistema recalcula o que a guilda
+            consegue resolver. Quando você evolui, novas possibilidades se desbloqueiam para todos.
+        </p>
+        <ol class="steps">
+            <li>Edite <code>manifest.json</code> com suas skills reais — veja o <a href="#">SKILL_MANIFEST_GUIDE</a></li>
+            <li>Reinicie o servidor para carregar o manifesto atualizado</li>
+            <li>Escolha sua primeira quest em <a href="/quests">Quests</a></li>
+            <li>Abra uma issue no repositório com o label <code>hero</code> para se registrar na guilda</li>
+        </ol>
+        <p style="margin-top:16px; font-size:12px; color: var(--text3);">
+            Mais informação é revelada conforme você completa quests e sobe de nível.
+            Você está em <strong th:text="${heroLevel.name()}">APPRENTICE</strong>
+            — próximo nível: <strong>Journeyman (nível 3)</strong>.
+        </p>
+    </div>
+
+    <!-- Stats row -->
+    <div class="grid-3 section-gap">
+        <div class="card">
+            <div class="card-title">Heróis na Guilda</div>
+            <div class="stat-num" th:text="${memberCount}">0</div>
+            <div class="stat-label">membros ativos</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Quests Abertas</div>
+            <div class="stat-num" th:text="${openQuests}">0</div>
+            <div class="stat-label">disponíveis agora</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Quests Completadas</div>
+            <div class="stat-num" th:text="${completedQuests}">0</div>
+            <div class="stat-label">pela guilda</div>
+        </div>
+    </div>
+
+    <div class="grid-2 section-gap">
+
+        <!-- Hero card -->
+        <div class="card">
+            <div class="card-title">Seu Herói</div>
+            <div style="margin-bottom:12px;">
+                <div style="font-size:18px; font-weight:600;" th:text="${hero.heroName}">Hero</div>
+                <div style="font-size:12px; color:var(--text3); margin-top:2px;" th:text="${hero.heroClass}">Class</div>
+                <div style="font-size:12px; color:var(--text2); margin-top:8px;" th:text="${hero.specialty}">Specialty</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <span th:each="skill : ${hero.skills}" class="skill-pill" th:text="${skill}">skill</span>
+            </div>
+            <div>
+                <div style="font-size:11px; color:var(--text3); margin-bottom:4px;" th:text="'Nível ' + ${hero.level} + ' · ' + ${hero.xp} + ' XP'">Level</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" th:style="'width:' + ${hero.xp % 1000 / 10} + '%'"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guild members — visible to all -->
+        <div class="card">
+            <div class="card-title">Membros da Guilda</div>
+            <div th:if="${members.isEmpty()}" style="color:var(--text3); font-size:12px; text-align:center; padding:20px 0;">
+                Nenhum herói registrado ainda.<br>Seja o primeiro — abra uma issue com label <code>hero</code>.
+            </div>
+            <div th:each="member : ${members}" class="member-row">
+                <img th:if="${member.avatarUrl != null and !member.avatarUrl.isEmpty()}"
+                     th:src="${member.avatarUrl}" class="avatar" alt="">
+                <div th:unless="${member.avatarUrl != null and !member.avatarUrl.isEmpty()}"
+                     class="avatar-placeholder" th:text="${member.heroName.substring(0,1)}">H</div>
+                <div>
+                    <div class="member-name" th:text="${member.heroName}">Hero</div>
+                    <div class="member-class" th:text="${member.heroClass}">Class</div>
+                </div>
+                <div class="member-level" th:text="'Lv ' + ${member.level}">Lv 1</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Journeyman+ unlock: Architecture overview -->
+    <div th:if="${isJourneymanPlus}" class="card section-gap">
+        <div class="card-title">Arquitetura da Guilda</div>
+        <pre style="font-size:12px; color:var(--text2); line-height:1.8;">
+Frontend (SSE) → Guild Hub :8080 → CompletableFuture.allOf()
+                                  → Herói :8081 (phi3:mini)
+                                  → Herói :8082 (phi3:mini)
+                                  → Herói :8083 (phi3:mini)
+                                  → Sintetizador :8090 (qwen2.5:7b)
+        </pre>
+        <p style="font-size:12px; color:var(--text3); margin-top:12px;">
+            Você alcançou o nível Journeyman. Consulte <code>PROJECT_CONTEXT.md</code> para os contratos completos.
+        </p>
+    </div>
+    <div th:unless="${isJourneymanPlus}" class="locked-card section-gap">
+        <div class="lock-icon">🔒</div>
+        <div style="font-size:13px;">Arquitetura da Guilda</div>
+        <div class="unlock-hint">Desbloqueado no nível Journeyman (3)</div>
+    </div>
+
+    <!-- Expert+ unlock: Guild metrics -->
+    <div th:if="${isExpertPlus}" class="grid-2 section-gap">
+        <div class="card">
+            <div class="card-title">Skill Gap Dashboard</div>
+            <p style="font-size:12px; color:var(--text2);">
+                Análise de capacidade disponível vs. quests bloqueadas por falta de skill.
+                Desbloqueado para heróis Expert+.
+            </p>
+        </div>
+        <div class="card">
+            <div class="card-title">XP Leaderboard</div>
+            <div th:each="member : ${members}" style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border); font-size:12px;">
+                <span th:text="${member.heroName}">Hero</span>
+                <span style="color:var(--yellow);" th:text="${member.xp} + ' XP'">0 XP</span>
+            </div>
+        </div>
+    </div>
+    <div th:unless="${isExpertPlus}" class="locked-card section-gap">
+        <div class="lock-icon">🔒</div>
+        <div style="font-size:13px;">Métricas Avançadas &amp; Leaderboard</div>
+        <div class="unlock-hint">Desbloqueado no nível Expert (5)</div>
+    </div>
+
+    <!-- Live event feed (SSE) — visible to all -->
+    <div class="card section-gap">
+        <div class="card-title">Eventos da Guilda <span style="float:right; color:var(--green); font-size:10px;" id="sse-status">● conectando...</span></div>
+        <div class="event-feed" id="event-feed">
+            <div style="color:var(--text3); font-size:12px; padding:8px 0;">Aguardando eventos...</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const feed = document.getElementById('event-feed');
+    const status = document.getElementById('sse-status');
+    const es = new EventSource('/events');
+
+    es.onopen = () => { status.textContent = '● ao vivo'; status.style.color = 'var(--green)'; };
+    es.onerror = () => { status.textContent = '● desconectado'; status.style.color = 'var(--red)'; };
+
+    es.addEventListener('GUILD_STATE', e => {
+        const d = JSON.parse(e.data);
+        addEvent('GUILD', `${d.heroes} heróis · ${d.openQuests} quests abertas · ${d.completedQuests} completadas`);
+    });
+    es.addEventListener('HERO_JOINED', e => {
+        const d = JSON.parse(e.data);
+        addEvent('ENTROU', `${d.heroId} entrou na guilda. ${d.questsUnlocked || 0} quests desbloqueadas.`);
+    });
+    es.addEventListener('QUEST_UNLOCKED', e => {
+        const d = JSON.parse(e.data);
+        addEvent('QUEST', `[${d.rarity}] ${d.title} desbloqueada — +${d.xpReward} XP`);
+    });
+
+    function addEvent(type, msg) {
+        const t = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        const div = document.createElement('div');
+        div.className = 'event-item';
+        div.innerHTML = `<span class="event-dot"></span><span class="event-time">${t}</span><span><strong>${type}</strong> — ${msg}</span>`;
+        feed.prepend(div);
+        const placeholder = feed.querySelector('[style*="Aguardando"]');
+        if (placeholder) placeholder.remove();
+    }
+</script>
+
+</body>
+</html>

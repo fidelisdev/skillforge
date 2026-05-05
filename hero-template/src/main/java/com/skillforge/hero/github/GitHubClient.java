@@ -1,0 +1,173 @@
+package com.skillforge.hero.github;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.skillforge.hero.domain.GuildMember;
+import com.skillforge.hero.domain.Quest;
+import com.skillforge.hero.domain.QuestRarity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Component
+public class GitHubClient {
+
+    private final HttpClient http;
+    private final ObjectMapper mapper;
+    private final String owner;
+    private final String repo;
+    private final String token;
+    private static final String API = "https://api.github.com";
+
+    public GitHubClient(
+            @Value("${guild.github.owner}") String owner,
+            @Value("${guild.github.repo}") String repo,
+            @Value("${guild.github.token:}") String token) {
+        this.owner = owner;
+        this.repo = repo;
+        this.token = token;
+        this.http = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+        this.mapper = new ObjectMapper();
+    }
+
+    public List<Quest> fetchQuests() {
+        try {
+            String url = "%s/repos/%s/%s/issues?labels=quest&state=all&per_page=100".formatted(API, owner, repo);
+            JsonNode issues = get(url);
+            List<Quest> quests = new ArrayList<>();
+            for (JsonNode issue : issues) {
+                parseQuest(issue).ifPresent(quests::add);
+            }
+            return quests;
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    public List<GuildMember> fetchHeroes() {
+        try {
+            String url = "%s/repos/%s/%s/issues?labels=hero&state=open&per_page=100".formatted(API, owner, repo);
+            JsonNode issues = get(url);
+            List<GuildMember> members = new ArrayList<>();
+            for (JsonNode issue : issues) {
+                parseHero(issue).ifPresent(members::add);
+            }
+            return members;
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    public int countCompletedQuests(String heroId) {
+        try {
+            String url = "%s/repos/%s/%s/issues?labels=quest,completed&state=closed&per_page=100".formatted(API, owner, repo);
+            JsonNode issues = get(url);
+            int count = 0;
+            for (JsonNode issue : issues) {
+                JsonNode assignee = issue.path("assignee");
+                if (!assignee.isMissingNode() && !assignee.isNull()) {
+                    String login = assignee.path("login").asText("");
+                    if (login.equalsIgnoreCase(heroId)) count++;
+                }
+            }
+            return count;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private Optional<Quest> parseQuest(JsonNode issue) {
+        try {
+            String title = issue.path("title").asText();
+            int number = issue.path("number").asInt();
+            String body = issue.path("body").asText("");
+            String state = issue.path("state").asText("open");
+            String url = issue.path("html_url").asText("");
+
+            QuestRarity rarity = QuestRarity.COMMON;
+            List<String> requiredSkills = new ArrayList<>();
+            int xpReward = 100;
+
+            for (JsonNode label : issue.path("labels")) {
+                String name = label.path("name").asText();
+                try { rarity = QuestRarity.valueOf(name.toUpperCase()); } catch (IllegalArgumentException ignored) {}
+                if (name.startsWith("skill:")) requiredSkills.add(name.substring(6));
+                if (name.startsWith("xp:")) {
+                    try { xpReward = Integer.parseInt(name.substring(3)); } catch (NumberFormatException ignored) {}
+                }
+            }
+
+            String assigneeLogin = Optional.ofNullable(issue.get("assignee"))
+                    .filter(n -> !n.isNull())
+                    .map(n -> n.path("login").asText(""))
+                    .orElse("");
+
+            // Extract quest ID from title if present (e.g. [QUEST-001])
+            String id = "QUEST-%03d".formatted(number);
+            if (title.startsWith("[QUEST-")) {
+                id = title.substring(1, title.indexOf(']'));
+                title = title.substring(title.indexOf(']') + 2).trim();
+            }
+
+            return Optional.of(new Quest(id, title, body, rarity, state, requiredSkills, xpReward, assigneeLogin, url, number));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<GuildMember> parseHero(JsonNode issue) {
+        try {
+            String body = issue.path("body").asText("{}");
+            JsonNode manifest = mapper.readTree(body);
+
+            String heroId = manifest.path("heroId").asText("");
+            if (heroId.isBlank()) return Optional.empty();
+
+            List<String> skills = new ArrayList<>();
+            manifest.path("skills").forEach(s -> skills.add(s.asText()));
+
+            JsonNode user = issue.path("user");
+            String avatarUrl = user.path("avatar_url").asText("");
+            String githubLogin = user.path("login").asText("");
+
+            return Optional.of(new GuildMember(
+                    heroId,
+                    manifest.path("heroName").asText(heroId),
+                    manifest.path("heroClass").asText("Unknown"),
+                    skills,
+                    manifest.path("level").asInt(1),
+                    manifest.path("xp").asInt(0),
+                    manifest.path("specialty").asText(""),
+                    githubLogin,
+                    avatarUrl
+            ));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    private JsonNode get(String url) throws Exception {
+        var builder = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Accept", "application/vnd.github+json")
+                .header("X-GitHub-Api-Version", "2022-11-28")
+                .GET();
+
+        if (!token.isBlank()) {
+            builder.header("Authorization", "Bearer " + token);
+        }
+
+        HttpResponse<String> response = http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+        return mapper.readTree(response.body());
+    }
+}
