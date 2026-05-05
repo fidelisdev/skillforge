@@ -35,3 +35,4 @@ target/
 
 # Local config overrides (keep manifest.json tracked as template)
 application-local.yml
+.env
